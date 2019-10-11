@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="assets/land.png" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/land.png" type="image/png" />
+
+    <meta charset="UTF-8" />
+    <meta name="description" content="Welcome to the unofficial Polytopia map generator! Generate maps of whatever sizes and properties." />
+    <meta name="author" content="QuasiStellar" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="og:url" content="https://quasistellar.github.io/PolytopiaMapGenerator/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Polytopia Map Generator" />
+    <meta property="og:description" content="Welcome to the unofficial Polytopia map generator! Generate maps of whatever sizes and properties." />
+    <meta property="og:image" content=https://quasistellar.github.io/PolytopiaMapGenerator/assets/logo.png" />
+
+    <title>Polytopia Battle Calculator</title>
+
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+    <script>
+        let page = 'main';
+
+        let map_size = 16;
+
+        let land = new Image();
+        land.src = "assets/land.png";
+        let ocean = new Image();
+        ocean.src = "assets/ocean.png";
+        let water = new Image();
+        water.src = "assets/water.png";
+
+        let imperius_capital = new Image();
+        imperius_capital.src = "assets/tribes/imperius_capital.png";
+
+        function switch_page(new_page) {
+            document.getElementById("main").style.display='none';
+            document.getElementById("faq").style.display='none';
+            page = new_page;
+            document.getElementById(new_page).style.display='block';
+        }
+        
+        function generate() {
+            map_size = parseInt(document.getElementById("map_size").value);
+            if (map_size < 5 || map_size !== Math.floor(map_size)) {
+                document.getElementById("warning").innerText = 'Warning: Map size must be integer at least 5.';
+                document.getElementById("warning").style.display='block';
+                return;
+            }
+
+            let initial_land = parseFloat(document.getElementById("initial_land").value);
+            if (initial_land < 0 || initial_land > 1) {
+                document.getElementById("warning").innerText = 'Warning: Initial land must be float between 0 and 1.';
+                document.getElementById("warning").style.display='block';
+                return;
+            }
+            let smoothing = parseInt(document.getElementById("smoothing").value);
+            if (smoothing < 0 || smoothing !== Math.floor(smoothing)) {
+                document.getElementById("warning").innerText = 'Warning: Smoothing must be integer at least 0.';
+                document.getElementById("warning").style.display='block';
+                return;
+            }
+            let relief = parseInt(document.getElementById("relief").value);
+            if (relief < 1 || relief > 8 || relief !== Math.floor(relief)) {
+                document.getElementById("warning").innerText = 'Warning: Relief must be integer between 1 and 8.';
+                document.getElementById("warning").style.display='block';
+                return;
+            }
+            let land_coefficient = (0.5 + relief) / 9;
+            let map = new Array(map_size);
+
+            for (let i = 0; i < map_size; i++) {
+                map[i] = new Array(map_size);
+                for (let j = 0; j < map_size; j++)
+                    map[i][j] = {type: 'ocean', above: null, road: false, tribe: null, image: ocean, image_above: null}
+            }
+
+            let i = 0;
+            while (i < map_size**2 * initial_land) {
+                let row = random_int(0, map_size - 1);
+                let column = random_int(0, map_size - 1);
+                if (map[row][column]['type'] === 'ocean') {
+                    i++;
+                    map[row][column]['type'] = 'land';
+                    map[row][column]['image'] = land;
+                }
+            }
+
+            for (let i = 0; i < smoothing; i++) {
+                for (let row = 0; row < map_size; row++) {
+                    for (let column = 0; column < map_size; column++) {
+                        let water_count = 0;
+                        let tile_count = 0;
+                        if (column > 0) {
+                            if (row > 0) {
+                                if (map[row - 1][column - 1]['type'] === 'ocean')
+                                    water_count++;
+                                tile_count++;
+                            }
+                            if (row < map_size - 1) {
+                                if (map[row + 1][column - 1]['type'] === 'ocean')
+                                    water_count++;
+                                tile_count++;
+                            }
+                            if (map[row][column - 1]['type'] === 'ocean')
+                                water_count++;
+                            tile_count++;
+                        }
+                        if (column < map_size - 1) {
+                            if (row > 0) {
+                                if (map[row - 1][column + 1]['type'] === 'ocean')
+                                    water_count++;
+                                tile_count++;
+                            }
+                            if (row < map_size - 1) {
+                                if (map[row + 1][column + 1]['type'] === 'ocean')
+                                    water_count++;
+                                tile_count++;
+                            }
+                            if (map[row][column + 1]['type'] === 'ocean')
+                                water_count++;
+                            tile_count++;
+                        }
+                        if (row > 0) {
+                            if (map[row - 1][column]['type'] === 'ocean')
+                                water_count++;
+                            tile_count++;
+                        }
+                        if (row < map_size - 1) {
+                            if (map[row + 1][column]['type'] === 'ocean')
+                                water_count++;
+                            tile_count++;
+                        }
+                        if (map[row][column]['type'] === 'ocean')
+                            water_count++;
+                        tile_count++;
+
+                        if (water_count / tile_count < land_coefficient)
+                            map[row][column]['road'] = true;
+                    }
+                }
+                for (let row = 0; row < map_size; row++) {
+                    for (let column = 0; column < map_size; column++) {
+                        if (map[row][column]['road'] === true) {
+                            map[row][column]['road'] = false;
+                            map[row][column]['type'] = 'land';
+                            map[row][column]['image'] = land;
+                        } else {
+                            map[row][column]['type'] = 'ocean';
+                            map[row][column]['image'] = ocean;
+                        }
+                    }
+                }
+            }
+
+            for (let row = 0; row < map_size; row++) {
+                for (let column = 0; column < map_size; column++) {
+                    if (map[row][column]['type'] === 'ocean') {
+                        if (column > 0) {
+                            if (map[row][column - 1]['type'] === 'land') {
+                                map[row][column]['type'] = 'water';
+                                map[row][column]['image'] = water;
+                                continue;
+                            }
+                        }
+                        if (column < map_size - 1) {
+                            if (map[row][column + 1]['type'] === 'land') {
+                                map[row][column]['type'] = 'water';
+                                map[row][column]['image'] = water;
+                                continue;
+                            }
+                        }
+                        if (row > 0) {
+                            if (map[row - 1][column]['type'] === 'land') {
+                                map[row][column]['type'] = 'water';
+                                map[row][column]['image'] = water;
+                                continue;
+                            }
+                        }
+                        if (row < map_size - 1) {
+                            if (map[row + 1][column]['type'] === 'land') {
+                                map[row][column]['type'] = 'water';
+                                map[row][column]['image'] = water;
+                            }
+                        }
+                    }
+                }
+            }
+
+            display_map(map);
+
+            let text_output_check = document.getElementById("text_output_check").checked;
+            if (text_output_check)
+                print_map(map);
+            else
+                document.getElementById("text_display").style.display='none';
+        }
+
+        function print_map(map) {
+            let seen_grid = Array(map_size**2 * 4);
+            for (let i = 0; i < map_size**2 * 4; i++) {
+                seen_grid[i] = '-';
+            }
+            for (let i = 0; i < map_size**2; i++) {
+                let row = Math.floor(i / map_size);
+                let column = i % map_size;
+                seen_grid[map_size - 1 + column - row + (column + row) * map_size * 2] = map[row][column]['type'][0];
+            }
+            let output = '';
+            for (let i = 0; i < map_size * 2; i++) {
+                output += seen_grid.slice(i * map_size * 2, (i + 1) * map_size * 2).join('');
+                output += '\n'
+            }
+
+            document.getElementById("text_display").innerText = output;
+            document.getElementById("text_display").style.display='block';
+        }
+
+        function display_map(map) {
+            let graphic_display = document.getElementById("graphic_display");
+            graphic_display.width = graphic_display.width;
+            let canvas = graphic_display.getContext("2d");
+
+            let tile_width = 1000 / map_size;
+            let tile_height = 604 / map_size;
+
+            for (let i = 0; i < map_size**2; i++) {
+                let row = Math.floor(i / map_size);
+                let column = i % map_size;
+                let x = 500 - tile_width / 2 + (column - row) * tile_width / 2;
+                let y = (column + row) * tile_height / 1908 * 606;
+                canvas.drawImage(map[row][column]['image'], x, y, tile_width, tile_height);
+                if (map[row][column]['image_above']) {
+                    canvas.drawImage(map[row][column]['image_above'], x, y, tile_width, tile_height);
+                }
+            }
+        }
+
+        function random_int(min, max) {
+            let rand = min + Math.random() * (max + 1 - min);
+            return Math.floor(rand);
+        }
+        
+        function toggle_tribe(tribe_check, tribe) {
+            if (document.getElementById(tribe_check).checked)
+                document.getElementById(tribe).style.display='block';
+            else
+                document.getElementById(tribe).style.display='none';
+        }
+    </script>
+
+    <noscript>
+        <h2>Polytopia Map Generator</h2>
+        <i>(by <a href="mailto:quasistellar.official@gmail.com" target="_top">QuasiStellar</a>)</i>
+        <p>Javascript is required to use the generator!</p>
+        <p>If you are worried about potential security issues, you can always review the code at the project's <a href="https://github.com/QuasiStellar/PolytopiaMapGenerator">GitHub repository</a>.</p>
+    </noscript>
+
+    <div id="main">
+        <h2>Polytopia Map Generator</h2>
+        <span style="display: inline-block"><i>(by <a href="mailto:quasistellar.official@gmail.com" target="_top">QuasiStellar</a>)</i></span>
+
+        <p id="warning" style="display: none">Warning.</p>
+
+        <p>Map size:</p>
+        <input type="number" id="map_size" value="16" min="5" step="1" required>
+
+        <p>Initial land:</p>
+        <input type="number" id="initial_land" value="0.5" min="0" max="1" step="0.01" required>
+        <p>Smoothing:</p>
+        <input type="number" id="smoothing" value="3" min="0" step="1" required>
+        <p>Relief:</p>
+        <input type="number" id="relief" value="4" min="1" max="8" step="1" required>
+        <p>Text output:</p>
+        <input type="checkbox" id="text_output_check">
+
+
+        <p><button type="button" onclick="generate()">Generate!</button>
+
+        <p id="text_display" style="display: none">None</p>
+
+        <canvas id="graphic_display" width="1000" height="604"></canvas>
+
+        <p><button type="button" onclick="switch_page('faq')">FAQ</button>
+    </div>
+
+    <div id="faq" style="display: none">
+        <h2>Frequently Asked Questions</h2>
+
+        <p><button type="button" onclick="switch_page('main')">Generator</button>
+    </div>
+</body>
+
+</html>
