@@ -6,7 +6,7 @@ let map_size = 16;
 let tribes = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
     'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
 let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
-let general_terrain = ['ocean', 'water'];
+let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
 
 let assets = [];
 for (let tribe of tribes) {
