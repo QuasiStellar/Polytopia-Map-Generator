@@ -3,19 +3,19 @@ let page = 'main';
 
 let map_size = 16;
 
-let tribes = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
+let tribes_list = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
     'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
 let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
 let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
 
 let assets = [];
-for (let tribe of tribes) {
+for (let tribe of tribes_list) {
     assets[tribe] = [];
 }
 for (let g_t of general_terrain) {
     assets[g_t] = get_image("assets/" + g_t + ".png");
 }
-for (let tribe of tribes) {
+for (let tribe of tribes_list) {
     for (let terr of terrain) {
         assets[tribe][terr] = get_image("assets/Tribes/" + tribe + "/" + tribe + " " + terr + ".png");
     }
@@ -51,18 +51,33 @@ function generate() {
         document.getElementById("warning").style.display='block';
         return;
     }
+
     let smoothing = parseInt(document.getElementById("smoothing").value);
     if (smoothing < 0 || smoothing !== Math.floor(smoothing)) {
         document.getElementById("warning").innerText = 'Warning: Smoothing must be integer at least 0.';
         document.getElementById("warning").style.display='block';
         return;
     }
+
     let relief = parseInt(document.getElementById("relief").value);
     if (relief < 1 || relief > 8 || relief !== Math.floor(relief)) {
         document.getElementById("warning").innerText = 'Warning: Relief must be integer between 1 and 8.';
         document.getElementById("warning").style.display='block';
         return;
     }
+
+    let tribes = document.getElementById("tribes").value;
+    tribes = tribes.split(" ");
+    for (let tribe of tribes) {
+        if (!tribes_list.includes(tribe)) {
+            document.getElementById("warning").innerText = 'Warning: list tribes in pick-order separating with spaces.';
+            document.getElementById("warning").style.display='block';
+            return;
+        }
+    }
+
+    document.getElementById("warning").style.display='none';
+
     let land_coefficient = (0.5 + relief) / 9;
     let map = new Array(map_size);
 
@@ -176,8 +191,6 @@ function generate() {
             }
         }
     }
-
-
 
     display_map(map);
 
