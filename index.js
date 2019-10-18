@@ -19,10 +19,8 @@ for (let tribe of tribes_list) {
     for (let terr of terrain) {
         assets[tribe][terr] = get_image("assets/Tribes/" + tribe + "/" + tribe + " " + terr + ".png");
     }
+    assets[tribe]['capital'] = get_image("assets/Tribes/" + tribe + "/" + tribe + " head.png");
 }
-
-let imperius_capital = new Image();
-imperius_capital.src = "assets/tribes/imperius_capital.png";
 
 function switch_page(new_page) {
     document.getElementById("main").style.display='none';
@@ -192,6 +190,47 @@ function generate() {
         }
     }
 
+    let capital_cells = [];
+    let capital_map = {};
+    for (let tribe of tribes) {
+        for (let row = 2; row < map_size - 2; row++) {
+            for (let column = 2; column < map_size - 2; column++) {
+                if (map[row][column]['type'] === 'ground') {
+                    capital_map[row * map_size + column] = 0;
+                }
+            }
+        }
+    }
+    for (let tribe of tribes) {
+        let max = 0;
+        for (let cell in capital_map) {
+            capital_map[cell] = map_size;
+            for (let capital_cell of capital_cells) {
+                capital_map[cell] = Math.min(capital_map[cell], distance(cell, capital_cell, map_size));
+            }
+            max = Math.max(max, capital_map[cell]);
+        }
+        let len = 0;
+        for (let cell in capital_map) {
+            if (capital_map[cell] === max) {
+                len++;
+            }
+        }
+        let rand_cell = random_int(0, len - 1);
+        for (let cell of Object.entries(capital_map)) {
+            if (cell[1] === max) {
+                if (rand_cell === 0) {
+                    capital_cells.push(cell[0]);
+                }
+                rand_cell--;
+            }
+        }
+    }
+    for (let i = 0; i < capital_cells.length; i++) {
+        map[capital_cells[i] / map_size | 0][capital_cells[i] % map_size]['above'] = 'capital';
+        map[capital_cells[i] / map_size | 0][capital_cells[i] % map_size]['tribe'] = tribes[i];
+    }
+
     display_map(map);
 
     let text_output_check = document.getElementById("text_output_check").checked;
@@ -199,6 +238,14 @@ function generate() {
         print_map(map);
     else
         document.getElementById("text_display").style.display='none';
+}
+
+function distance(a, b, size) {
+    let ax = a % size;
+    let ay = a / size | 0;
+    let bx = b % size;
+    let by = b / size | 0;
+    return Math.max(Math.abs(ax - bx), Math.abs(ay - by));
 }
 
 function print_map(map) {
@@ -235,11 +282,15 @@ function display_map(map) {
         let x = 500 - tile_width / 2 + (column - row) * tile_width / 2;
         let y = (column + row) * tile_height / 1908 * 606;
         let type = map[row][column]['type'];
+        let above = map[row][column]['above'];
         let tribe = map[row][column]['tribe'];
         if (general_terrain.includes(type)) {
             canvas.drawImage(assets[type], x, y, tile_width, tile_height);
         } else if (tribe) {
             canvas.drawImage(assets[tribe][type], x, y, tile_width, tile_height);
+        }
+        if (above === 'capital') {
+            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_height, tile_width, tile_width);
         }
     }
 }
