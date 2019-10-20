@@ -273,24 +273,23 @@ function display_map(map) {
     graphic_display.width = graphic_display.width;
     let canvas = graphic_display.getContext("2d");
 
-    let tile_width = 1000 / map_size;
-    let tile_height = 604 / map_size;
+    let tile_size = 1000 / map_size;
 
     for (let i = 0; i < map_size**2; i++) {
         let row = Math.floor(i / map_size);
         let column = i % map_size;
-        let x = 500 - tile_width / 2 + (column - row) * tile_width / 2;
-        let y = (column + row) * tile_height / 1908 * 606;
+        let x = 500 - tile_size / 2 + (column - row) * tile_size / 2;
+        let y = (column + row) * tile_size / 1908 * 606;
         let type = map[row][column]['type'];
         let above = map[row][column]['above'];
         let tribe = map[row][column]['tribe'];
         if (general_terrain.includes(type)) {
-            canvas.drawImage(assets[type], x, y, tile_width, tile_height);
+            canvas.drawImage(assets[type], x, y, tile_size, tile_size);
         } else if (tribe) {
-            canvas.drawImage(assets[tribe][type], x, y, tile_width, tile_height);
+            canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
         }
         if (above === 'capital') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_height, tile_width, tile_width);
+            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_size, tile_size, tile_size);
         }
     }
 }
