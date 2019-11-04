@@ -252,7 +252,7 @@ function print_map(map) {
     let seen_grid = Array(map_size**2 * 4);
     for (let i = 0; i < map_size**2 * 4; i++) {
         seen_grid[i] = '-';
-    }
+}
     for (let i = 0; i < map_size**2; i++) {
         let row = Math.floor(i / map_size);
         let column = i % map_size;
