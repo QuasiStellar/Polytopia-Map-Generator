@@ -240,6 +240,12 @@ function generate() {
         document.getElementById("text_display").style.display='none';
 }
 
+function initial_gen() {
+    setTimeout(function () {
+        generate();
+    }, 1000);
+}
+
 function distance(a, b, size) {
     let ax = a % size;
     let ay = a / size | 0;
@@ -252,7 +258,7 @@ function print_map(map) {
     let seen_grid = Array(map_size**2 * 4);
     for (let i = 0; i < map_size**2 * 4; i++) {
         seen_grid[i] = '-';
-}
+    }
     for (let i = 0; i < map_size**2; i++) {
         let row = Math.floor(i / map_size);
         let column = i % map_size;
