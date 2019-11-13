@@ -292,10 +292,10 @@ function display_map(map) {
         if (general_terrain.includes(type)) {
             canvas.drawImage(assets[type], x, y, tile_size, tile_size);
         } else if (tribe) {
-            canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
+            canvas.drawImage(assets['Imperius'][type], x, y, tile_size, tile_size);
         }
         if (above === 'capital') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_size, tile_size, tile_size);
+            canvas.drawImage(assets['Imperius'][above], x, y - 0.75 * tile_size, tile_size, tile_size);
         }
     }
 }
