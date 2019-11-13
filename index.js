@@ -17,9 +17,9 @@ for (let g_t of general_terrain) {
 }
 for (let tribe of tribes_list) {
     for (let terr of terrain) {
-        assets[tribe][terr] = get_image("assets/" + tribe + " " + terr + ".png");
+        assets[tribe][terr] = get_image("assets/" + tribe + "_" + terr + ".png");
     }
-    assets[tribe]['capital'] = get_image("assets/" + tribe + " head.png");
+    assets[tribe]['capital'] = get_image("assets/" + tribe + "_head.png");
 }
 
 function switch_page(new_page) {
