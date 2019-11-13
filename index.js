@@ -5,7 +5,7 @@ let map_size = 16;
 
 let tribes_list = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
     'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
-let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
+let terrain = [/*'forest', 'fruit', 'game', */'ground'/*, 'mountain'*/];
 let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
 
 let assets = [];
@@ -17,9 +17,9 @@ for (let g_t of general_terrain) {
 }
 for (let tribe of tribes_list) {
     for (let terr of terrain) {
-        assets[tribe][terr] = get_image("assets/Tribes/" + tribe + "/" + tribe + " " + terr + ".png");
+        assets[tribe][terr] = get_image("assets/" + tribe + " " + terr + ".png");
     }
-    assets[tribe]['capital'] = get_image("assets/Tribes/" + tribe + "/" + tribe + " head.png");
+    assets[tribe]['capital'] = get_image("assets/" + tribe + " head.png");
 }
 
 function switch_page(new_page) {
