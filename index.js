@@ -1,11 +1,11 @@
 
 let page = 'main';
 
-let map_size = 16;
+let map_size = 64;
 
 let tribes_list = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
     'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
-let terrain = [/*'forest', 'fruit', 'game', */'ground'/*, 'mountain'*/];
+let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
 let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
 
 let assets = [];
@@ -240,12 +240,6 @@ function generate() {
         document.getElementById("text_display").style.display='none';
 }
 
-function initial_gen() {
-    setTimeout(function () {
-        generate();
-    }, 1000);
-}
-
 function distance(a, b, size) {
     let ax = a % size;
     let ay = a / size | 0;
@@ -292,10 +286,10 @@ function display_map(map) {
         if (general_terrain.includes(type)) {
             canvas.drawImage(assets[type], x, y, tile_size, tile_size);
         } else if (tribe) {
-            canvas.drawImage(assets['Imperius'][type], x, y, tile_size, tile_size);
+            canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
         }
         if (above === 'capital') {
-            canvas.drawImage(assets['Imperius'][above], x, y - 0.75 * tile_size, tile_size, tile_size);
+            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_size, tile_size, tile_size);
         }
     }
 }
