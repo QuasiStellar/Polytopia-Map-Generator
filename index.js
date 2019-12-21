@@ -87,8 +87,8 @@ function generate() {
 
     let i = 0;
     while (i < map_size**2 * initial_land) {
-        let row = random_int(0, map_size - 1);
-        let column = random_int(0, map_size - 1);
+        let row = random_int(0, map_size);
+        let column = random_int(0, map_size);
         if (map[row][column]['type'] === 'ocean') {
             i++;
             map[row][column]['type'] = 'ground';
@@ -216,7 +216,7 @@ function generate() {
                 len++;
             }
         }
-        let rand_cell = random_int(0, len - 1);
+        let rand_cell = random_int(0, len);
         for (let cell of Object.entries(capital_map)) {
             if (cell[1] === max) {
                 if (rand_cell === 0) {
@@ -230,6 +230,51 @@ function generate() {
         map[capital_cells[i] / map_size | 0][capital_cells[i] % map_size]['above'] = 'capital';
         map[capital_cells[i] / map_size | 0][capital_cells[i] % map_size]['tribe'] = tribes[i];
     }
+
+    let done_tiles = [];
+    let active_tiles = [];
+    for (let i = 0; i < capital_cells.length; i++) {
+        let row = capital_cells[i] / map_size | 0;
+        let column = capital_cells[i] % map_size;
+        done_tiles[i] = [row, column];
+        active_tiles[i] = [[row, column]];
+    }
+    while (done_tiles.length !== map_size**2) {
+        for (let i = 0; i < tribes.length; i++) {
+            if (active_tiles[i].length) {
+                let rand_number = random_int(0, active_tiles[i].length);
+                let rand_cell = active_tiles[i][rand_number];
+                let neighbours = [[rand_cell[0]-1, rand_cell[1]],
+                                [rand_cell[0]+1, rand_cell[1]],
+                                [rand_cell[0], rand_cell[1]+1],
+                                [rand_cell[0], rand_cell[1]-1],
+                                [rand_cell[0]-1, rand_cell[1]-1],
+                                [rand_cell[0]+1, rand_cell[1]+1],
+                                [rand_cell[0]-1, rand_cell[1]+1],
+                                [rand_cell[0]+1, rand_cell[1]-1]];
+                let valid_neighbours = neighbours.filter(value => !arr_in_arr(value, done_tiles) &&
+                                0 <= value[0] && value[0] < map_size && 0 <= value[1] && value[1] < map_size &&
+                                map[value[0]][value[1]]['type'] !== 'water');
+                if (!valid_neighbours.length) {
+                    valid_neighbours = neighbours.filter(value => !arr_in_arr(value, done_tiles) &&
+                        0 <= value[0] && value[0] < map_size && 0 <= value[1] && value[1] < map_size);
+                }
+                if (valid_neighbours.length) {
+                    let new_rand_number = random_int(0, valid_neighbours.length);
+                    let new_rand_cell = valid_neighbours[new_rand_number];
+                    map[new_rand_cell[0]][new_rand_cell[1]]['tribe'] = tribes[i];
+                    display_map(map);
+                    active_tiles[i].push(new_rand_cell);
+                    done_tiles.push(new_rand_cell);
+                } else {
+                    active_tiles[i].splice(rand_number, 1);
+                }
+            }
+        }
+    }
+
+    // console.log(done_tiles);
+    // console.log(active_tiles);
 
     display_map(map);
 
@@ -295,13 +340,22 @@ function display_map(map) {
 }
 
 function random_int(min, max) {
-    let rand = min + Math.random() * (max + 1 - min);
+    let rand = min + Math.random() * (max - min);
     return Math.floor(rand);
 }
 
-function toggle_tribe(tribe_check, tribe) {
-    if (document.getElementById(tribe_check).checked)
-        document.getElementById(tribe).style.display='block';
-    else
-        document.getElementById(tribe).style.display='none';
+function arr_in_arr(piece_a, array) {
+    for (let piece_b of array) {
+        if (piece_b.length === piece_a.length) {
+            let equal = true;
+            for (let i = 0; i < piece_a.length; i++) {
+                if (piece_b[i] !== piece_a[i]) {
+                    equal = false;
+                }
+            }
+            if (equal)
+                return true;
+        }
+    }
+    return false;
 }
