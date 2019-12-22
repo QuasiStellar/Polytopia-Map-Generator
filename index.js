@@ -241,7 +241,7 @@ function generate() {
     }
     while (done_tiles.length !== map_size**2) {
         for (let i = 0; i < tribes.length; i++) {
-            if (active_tiles[i].length) {
+            if (active_tiles[i].length && tribes[i] !== 'Polaris') {
                 let rand_number = random_int(0, active_tiles[i].length);
                 let rand_cell = active_tiles[i][rand_number];
                 let neighbours = [[rand_cell[0]-1, rand_cell[1]],
