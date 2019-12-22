@@ -263,7 +263,6 @@ function generate() {
                     let new_rand_number = random_int(0, valid_neighbours.length);
                     let new_rand_cell = valid_neighbours[new_rand_number];
                     map[new_rand_cell[0]][new_rand_cell[1]]['tribe'] = tribes[i];
-                    display_map(map);
                     active_tiles[i].push(new_rand_cell);
                     done_tiles.push(new_rand_cell);
                 } else {
@@ -273,8 +272,7 @@ function generate() {
         }
     }
 
-    // console.log(done_tiles);
-    // console.log(active_tiles);
+
 
     display_map(map);
 
