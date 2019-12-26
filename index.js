@@ -3,16 +3,16 @@ let page = 'main';
 
 let map_size = 64;
 
-let tribes_list = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
-    'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
+let tribes_list = ['Xin-xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi',
+    'Ai-mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
 let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
 let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
-let terrain_probs = {'forest': {'Xin-Xi': 0.31, 'Imperius': 0.34, 'Bardur': 0.34, 'Oumaji': 0.034, 'Kickoo': 0.222, 'Hoodrick': 0.555, 'Luxidoor': 0.34,
-                        'Vengir': 0.34, 'Zebasi': 0.185, 'Ai-Mo': 0.31, 'Quetzali': 0.34, 'Yadakk': 0.185, 'Aquarion': 0.119, 'Elyrion': 0.37, 'Polaris': 0},
-                    'mountain': {'Xin-Xi': 0.225, 'Imperius': 0.15, 'Bardur': 0.15, 'Oumaji': 0.15, 'Kickoo': 0.045, 'Hoodrick': 0.075, 'Luxidoor': 0.15,
-                        'Vengir': 0.15, 'Zebasi': 0.075, 'Ai-Mo': 0.225, 'Quetzali': 0.15, 'Yadakk': 0.075, 'Aquarion': 0.105, 'Elyrion': 0.075, 'Polaris': 0},
-                    'water': {'Xin-Xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaji': 0, 'Kickoo': 0.4, 'Hoodrick': 0, 'Luxidoor': 0,
-                        'Vengir': 0, 'Zebasi': 0, 'Ai-Mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0, 'Polaris': 0}};
+let terrain_probs = {'forest': {'Xin-xi': 0.31, 'Imperius': 0.34, 'Bardur': 0.34, 'Oumaji': 0.034, 'Kickoo': 0.222, 'Hoodrick': 0.555, 'Luxidoor': 0.34,
+                        'Vengir': 0.34, 'Zebasi': 0.185, 'Ai-mo': 0.31, 'Quetzali': 0.34, 'Yadakk': 0.185, 'Aquarion': 0.119, 'Elyrion': 0.37, 'Polaris': 0},
+                    'mountain': {'Xin-xi': 0.225, 'Imperius': 0.15, 'Bardur': 0.15, 'Oumaji': 0.15, 'Kickoo': 0.045, 'Hoodrick': 0.075, 'Luxidoor': 0.15,
+                        'Vengir': 0.15, 'Zebasi': 0.075, 'Ai-mo': 0.225, 'Quetzali': 0.15, 'Yadakk': 0.075, 'Aquarion': 0.105, 'Elyrion': 0.075, 'Polaris': 0},
+                    'water': {'Xin-xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaji': 0, 'Kickoo': 0.4, 'Hoodrick': 0, 'Luxidoor': 0,
+                        'Vengir': 0, 'Zebasi': 0, 'Ai-mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0, 'Polaris': 0}};
 
 let assets = [];
 for (let tribe of tribes_list) {
