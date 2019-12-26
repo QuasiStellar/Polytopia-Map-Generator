@@ -7,6 +7,12 @@ let tribes_list = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick
     'Ai-Mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
 let terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
 let general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
+let terrain_probs = {'forest': {'Xin-Xi': 0.31, 'Imperius': 0.34, 'Bardur': 0.34, 'Oumaji': 0.034, 'Kickoo': 0.222, 'Hoodrick': 0.555, 'Luxidoor': 0.34,
+                        'Vengir': 0.34, 'Zebasi': 0.185, 'Ai-Mo': 0.31, 'Quetzali': 0.34, 'Yadakk': 0.185, 'Aquarion': 0.119, 'Elyrion': 0.37, 'Polaris': 0},
+                    'mountain': {'Xin-Xi': 0.225, 'Imperius': 0.15, 'Bardur': 0.15, 'Oumaji': 0.15, 'Kickoo': 0.045, 'Hoodrick': 0.075, 'Luxidoor': 0.15,
+                        'Vengir': 0.15, 'Zebasi': 0.075, 'Ai-Mo': 0.225, 'Quetzali': 0.15, 'Yadakk': 0.075, 'Aquarion': 0.105, 'Elyrion': 0.075, 'Polaris': 0},
+                    'water': {'Xin-Xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaji': 0, 'Kickoo': 0.4, 'Hoodrick': 0, 'Luxidoor': 0,
+                        'Vengir': 0, 'Zebasi': 0, 'Ai-Mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0, 'Polaris': 0}};
 
 let assets = [];
 for (let tribe of tribes_list) {
@@ -17,9 +23,9 @@ for (let g_t of general_terrain) {
 }
 for (let tribe of tribes_list) {
     for (let terr of terrain) {
-        assets[tribe][terr] = get_image("assets/" + tribe + "_" + terr + ".png");
+        assets[tribe][terr] = get_image("assets/" + tribe + "/" + tribe + " " + terr + ".png");
     }
-    assets[tribe]['capital'] = get_image("assets/" + tribe + "_head.png");
+    assets[tribe]['capital'] = get_image("assets/" + tribe + "/" + tribe + " head.png");
 }
 
 function switch_page(new_page) {
@@ -160,36 +166,6 @@ function generate() {
         }
     }
 
-    for (let row = 0; row < map_size; row++) {
-        for (let column = 0; column < map_size; column++) {
-            if (map[row][column]['type'] === 'ocean') {
-                if (column > 0) {
-                    if (map[row][column - 1]['type'] === 'ground') {
-                        map[row][column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (column < map_size - 1) {
-                    if (map[row][column + 1]['type'] === 'ground') {
-                        map[row][column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (row > 0) {
-                    if (map[row - 1][column]['type'] === 'ground') {
-                        map[row][column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (row < map_size - 1) {
-                    if (map[row + 1][column]['type'] === 'ground') {
-                        map[row][column]['type'] = 'water';
-                    }
-                }
-            }
-        }
-    }
-
     let capital_cells = [];
     let capital_map = {};
     for (let tribe of tribes) {
@@ -272,7 +248,51 @@ function generate() {
         }
     }
 
+    for (let row = 0; row < map_size; row++) {
+        for (let column = 0; column < map_size; column++) {
+            if (map[row][column]['type'] === 'ground' && map[row][column]['above'] === null) {
+                let rand = Math.random();
+                if (rand < terrain_probs['forest'][map[row][column]['tribe']]) {
+                    map[row][column]['type'] = 'forest';
+                } else if (rand > 1 - terrain_probs['mountain'][map[row][column]['tribe']]) {
+                    map[row][column]['type'] = 'mountain';
+                } else if (Math.abs(0.5 - rand) < terrain_probs['water'][map[row][column]['tribe']] / 2) {
+                    map[row][column]['type'] = 'ocean';
+                }
+            }
+        }
+    }
 
+    let land_like_terrain = ['ground', 'forest', 'mountain'];
+    for (let row = 0; row < map_size; row++) {
+        for (let column = 0; column < map_size; column++) {
+            if (map[row][column]['type'] === 'ocean') {
+                if (column > 0) {
+                    if (land_like_terrain.indexOf(map[row][column - 1]['type']) !== -1) {
+                        map[row][column]['type'] = 'water';
+                        continue;
+                    }
+                }
+                if (column < map_size - 1) {
+                    if (land_like_terrain.indexOf(map[row][column + 1]['type']) !== -1) {
+                        map[row][column]['type'] = 'water';
+                        continue;
+                    }
+                }
+                if (row > 0) {
+                    if (land_like_terrain.indexOf(map[row - 1][column]['type']) !== -1) {
+                        map[row][column]['type'] = 'water';
+                        continue;
+                    }
+                }
+                if (row < map_size - 1) {
+                    if (land_like_terrain.indexOf(map[row + 1][column]['type']) !== -1) {
+                        map[row][column]['type'] = 'water';
+                    }
+                }
+            }
+        }
+    }
 
     display_map(map);
 
@@ -329,10 +349,15 @@ function display_map(map) {
         if (general_terrain.includes(type)) {
             canvas.drawImage(assets[type], x, y, tile_size, tile_size);
         } else if (tribe) {
-            canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
+            if (type === 'forest' || type === 'mountain') {
+                canvas.drawImage(assets[tribe]['ground'], x, y, tile_size, tile_size);
+                canvas.drawImage(assets[tribe][type], x, y - 0.3 * tile_size, tile_size, tile_size);
+            } else {
+                canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
+            }
         }
         if (above === 'capital') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.75 * tile_size, tile_size, tile_size);
+            canvas.drawImage(assets[tribe][above], x, y - 0.3 * tile_size, tile_size, tile_size);
         }
     }
 }
@@ -349,6 +374,7 @@ function arr_in_arr(piece_a, array) {
             for (let i = 0; i < piece_a.length; i++) {
                 if (piece_b[i] !== piece_a[i]) {
                     equal = false;
+                    break;
                 }
             }
             if (equal)
