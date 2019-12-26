@@ -88,7 +88,7 @@ function generate() {
     for (let i = 0; i < map_size; i++) {
         map[i] = new Array(map_size);
         for (let j = 0; j < map_size; j++)
-            map[i][j] = {type: 'ocean', above: null, road: false, tribe: 'Xin-Xi'}
+            map[i][j] = {type: 'ocean', above: null, road: false, tribe: 'Xin-xi'}
     }
 
     let i = 0;
