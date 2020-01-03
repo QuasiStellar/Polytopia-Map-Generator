@@ -36,6 +36,11 @@
     </noscript>
 
     <div id="main">
+
+        <p><button type="button" onclick="generate()">Generate!</button>
+
+        <canvas id="graphic_display" width="1000" height="700"></canvas>
+
         <h2>Polytopia Map Generator</h2>
         <span style="display: inline-block"><i>(by <a href="mailto:quasistellar.official@gmail.com" target="_top">QuasiStellar</a>)</i></span>
 
@@ -51,15 +56,11 @@
         <p>Relief:</p>
         <label for="relief"></label><input type="range" id="relief" value="4" min="1" max="8" step="1" required>
         <p>Tribes:</p>
-        <label for="tribes"></label><input type="text" id="tribes" value="Xin-xi Imperius Bardur Oumaji Kickoo Hoodrick Luxidoor Vengir Zebasi Ai-mo Quetzali Yadakk Aquarion Elyrion Polaris" required>
+        <label for="tribes"></label><input type="text" id="tribes" value="Xin-xi Imperius Bardur Oumaji Kickoo Hoodrick Luxidoor Vengir Zebasi Ai-mo Quetzali Yadakk" required>
         <p>Text output:</p>
         <label for="text_output_check"></label><input type="checkbox" id="text_output_check">
 
-        <p><button type="button" onclick="generate()">Generate!</button>
-
         <p id="text_display" style="display: none">None</p>
-
-        <canvas id="graphic_display" width="1000" height="700"></canvas>
 
         <p><button type="button" onclick="switch_page('faq')">FAQ</button>
     </div>

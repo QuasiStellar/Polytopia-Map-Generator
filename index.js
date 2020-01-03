@@ -31,7 +31,7 @@ const terrain_probs = {'water': {'Xin-xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaj
                         'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0},
                     'whale': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
                         'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0}};
-const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'farms': 0.5, 'fish': 0.5, 'game': 0.5, 'whale': 0.4};
+const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'crop': 0.5, 'fish': 0.5, 'game': 0.5, 'whale': 0.4, 'metal': 0.5};
 
 let assets = [];
 for (let tribe of tribes_list) {
@@ -390,6 +390,7 @@ function generate() {
             case 'mountain':
                 if (proc(cell, general_probs['metal'] * terrain_probs['metal'][map[cell]['tribe']])) {
                     map[cell]['above'] = 'metal';
+                    console.log(1)
                 }
                 break;
         }
@@ -439,11 +440,18 @@ function display_map(map) {
 
     let tile_size = 1000 / map_size;
 
+    function draw(image, x, y, tile_size) {
+        let new_height = image.height * tile_size / image.width;
+        canvas.drawImage(image, x, y, tile_size, new_height);
+    }
+
+    let tile_height = assets['Xin-xi']['ground'].height;
+    let tile_width = assets['Xin-xi']['ground'].width;
     for (let i = 0; i < map_size**2; i++) {
         let row = i / map_size | 0;
         let column = i % map_size;
         let x = 500 - tile_size / 2 + (column - row) * tile_size / 2;
-        let y = (column + row) * tile_size / 1908 * 606;
+        let y = (column + row) * tile_height * tile_size / tile_width / 1908 * 606;
         let type = map[row * map_size + column]['type'];
         let above = map[row * map_size + column]['above'];
         let tribe = map[row * map_size + column]['tribe'];
@@ -451,28 +459,51 @@ function display_map(map) {
             canvas.drawImage(assets[type], x, y, tile_size, tile_size);
         } else if (tribe) {
             if (type === 'forest' || type === 'mountain') {
-                canvas.drawImage(assets[tribe]['ground'], x, y, tile_size, tile_size);
-                canvas.drawImage(assets[tribe][type], x, y - 0.3 * tile_size, tile_size, tile_size);
+                let height = assets[tribe]['ground'].height;
+                let width = assets[tribe]['ground'].width;
+                canvas.drawImage(assets[tribe]['ground'], x, y, tile_size, height * tile_size / width);
+                height = assets[tribe][type].height;
+                width = assets[tribe][type].width;
+                let lowering = tribe === 'Kickoo' && type === 'mountain' ? 0.92 : 0.62;
+                canvas.drawImage(assets[tribe][type], x, y + lowering * tile_size - tile_size * height / width, tile_size, height * tile_size / width);
+            } else if (type === 'water' || type === 'ocean') {
+                let height = assets[tribe][type].height;
+                let width = assets[tribe][type].width;
+                canvas.drawImage(assets[tribe][type], x, y - 0.3 * tile_size, tile_size, height * tile_size / width);
             } else {
-                canvas.drawImage(assets[tribe][type], x, y, tile_size, tile_size);
+                let height = assets[tribe][type].height;
+                let width = assets[tribe][type].width;
+                canvas.drawImage(assets[tribe][type], x, y, tile_size, height * tile_size / width);
             }
         }
-        if (above === 'capital') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.3 * tile_size, tile_size, tile_size);
-        } else if (above === 'whale') {
-            canvas.drawImage(assets['whale'], x, y - 0.3 * tile_size, tile_size, tile_size);
+        if (above === 'whale') {
+            let height = assets[above].height;
+            let width = assets[above].width;
+            canvas.drawImage(assets['whale'], x, y, tile_size, height * tile_size / width);
         } else if (above === 'village') {
-            canvas.drawImage(assets['village'], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[above].height;
+            let width = assets[above].width;
+            canvas.drawImage(assets['village'], x, y, tile_size, height * tile_size / width);
         } else if (above === 'game') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[tribe][above].height;
+            let width = assets[tribe][above].width;
+            canvas.drawImage(assets[tribe][above], x, y, tile_size, height * tile_size / width);
         } else if (above === 'fruit') {
-            canvas.drawImage(assets[tribe][above], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[tribe][above].height;
+            let width = assets[tribe][above].width;
+            canvas.drawImage(assets[tribe][above], x, y, tile_size, height * tile_size / width);
         } else if (above === 'crop') {
-            canvas.drawImage(assets['crop'], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[above].height;
+            let width = assets[above].width;
+            canvas.drawImage(assets['crop'], x, y, tile_size, height * tile_size / width);
         } else if (above === 'fish') {
-            canvas.drawImage(assets['fish'], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[above].height;
+            let width = assets[above].width;
+            canvas.drawImage(assets['fish'], x, y, tile_size, height * tile_size / width);
         } else if (above === 'metal') {
-            canvas.drawImage(assets['metal'], x, y - 0.3 * tile_size, tile_size, tile_size);
+            let height = assets[above].height;
+            let width = assets[above].width;
+            canvas.drawImage(assets['metal'], x, y, tile_size, height * tile_size / width);
         }
     }
 }
