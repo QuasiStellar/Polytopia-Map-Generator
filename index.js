@@ -57,7 +57,7 @@ function switch_page(new_page) {
 function get_image(src) {
     let image = new Image();
     image.src = src;
-    return image;
+    return {'image': image, 'width': image.width, 'height': image.height};
 }
 
 function generate() {
@@ -390,7 +390,6 @@ function generate() {
             case 'mountain':
                 if (proc(cell, general_probs['metal'] * terrain_probs['metal'][map[cell]['tribe']])) {
                     map[cell]['above'] = 'metal';
-                    console.log(1)
                 }
                 break;
         }
@@ -440,11 +439,6 @@ function display_map(map) {
 
     let tile_size = 1000 / map_size;
 
-    function draw(image, x, y, tile_size) {
-        let new_height = image.height * tile_size / image.width;
-        canvas.drawImage(image, x, y, tile_size, new_height);
-    }
-
     let tile_height = assets['Xin-xi']['ground'].height;
     let tile_width = assets['Xin-xi']['ground'].width;
     for (let i = 0; i < map_size**2; i++) {
@@ -456,56 +450,42 @@ function display_map(map) {
         let above = map[row * map_size + column]['above'];
         let tribe = map[row * map_size + column]['tribe'];
         if (general_terrain.includes(type)) {
-            canvas.drawImage(assets[type], x, y, tile_size, tile_size);
+            canvas.drawImage(assets[type]['image'], x, y, tile_size, assets[type]['height'] * tile_size / assets[type]['width']);
         } else if (tribe) {
             if (type === 'forest' || type === 'mountain') {
-                let height = assets[tribe]['ground'].height;
-                let width = assets[tribe]['ground'].width;
-                canvas.drawImage(assets[tribe]['ground'], x, y, tile_size, height * tile_size / width);
-                height = assets[tribe][type].height;
-                width = assets[tribe][type].width;
-                let lowering = tribe === 'Kickoo' && type === 'mountain' ? 0.92 : 0.62;
-                canvas.drawImage(assets[tribe][type], x, y + lowering * tile_size - tile_size * height / width, tile_size, height * tile_size / width);
+                canvas.drawImage(assets[tribe]['ground']['image'], x, y, tile_size, assets[tribe]['ground']['height'] * tile_size / assets[tribe]['ground']['width']);
+                let lowering = tribe === 'Kickoo' && type === 'mountain' ? 0.82 : 0.52;
+                canvas.drawImage(assets[tribe][type]['image'], x, y + lowering * tile_size - tile_size * assets[tribe][type]['height'] / assets[tribe][type]['width'], tile_size, assets[tribe]['ground']['height'] * tile_size / assets[tribe]['ground']['width']);
             } else if (type === 'water' || type === 'ocean') {
-                let height = assets[tribe][type].height;
-                let width = assets[tribe][type].width;
-                canvas.drawImage(assets[tribe][type], x, y - 0.3 * tile_size, tile_size, height * tile_size / width);
+                canvas.drawImage(assets[tribe][type]['image'], x, y - 0.3 * tile_size, tile_size, assets[tribe][type]['height'] * tile_size / assets[tribe][type]['width']);
             } else {
-                let height = assets[tribe][type].height;
-                let width = assets[tribe][type].width;
-                canvas.drawImage(assets[tribe][type], x, y, tile_size, height * tile_size / width);
+                canvas.drawImage(assets[tribe][type]['image'], x, y, tile_size, assets[tribe][type]['height'] * tile_size / assets[tribe][type]['width']);
             }
         }
-        if (above === 'whale') {
-            let height = assets[above].height;
-            let width = assets[above].width;
-            canvas.drawImage(assets['whale'], x, y, tile_size, height * tile_size / width);
+
+        function draw_above(image) {
+            canvas.drawImage(image['image'], x, y, tile_size, image['height'] * tile_size / image['width']);
+        }
+
+        if (above === 'capital') {
+            canvas.drawImage(assets[tribe]['capital']['image'], x, y - 0.3 * tile_size, tile_size, assets[tribe]['capital']['height'] * tile_size / assets[tribe]['capital']['width']);
+        } else if (above === 'whale') {
+            draw_above(assets['whale']);
         } else if (above === 'village') {
-            let height = assets[above].height;
-            let width = assets[above].width;
-            canvas.drawImage(assets['village'], x, y, tile_size, height * tile_size / width);
+            draw_above(assets['village']);
         } else if (above === 'game') {
-            let height = assets[tribe][above].height;
-            let width = assets[tribe][above].width;
-            canvas.drawImage(assets[tribe][above], x, y, tile_size, height * tile_size / width);
+            draw_above(assets[tribe]['game']);
         } else if (above === 'fruit') {
-            let height = assets[tribe][above].height;
-            let width = assets[tribe][above].width;
-            canvas.drawImage(assets[tribe][above], x, y, tile_size, height * tile_size / width);
+            draw_above(assets[tribe]['fruit']);
         } else if (above === 'crop') {
-            let height = assets[above].height;
-            let width = assets[above].width;
-            canvas.drawImage(assets['crop'], x, y, tile_size, height * tile_size / width);
+            draw_above(assets['crop']);
         } else if (above === 'fish') {
-            let height = assets[above].height;
-            let width = assets[above].width;
-            canvas.drawImage(assets['fish'], x, y, tile_size, height * tile_size / width);
+            draw_above(assets['fish']);
         } else if (above === 'metal') {
-            let height = assets[above].height;
-            let width = assets[above].width;
-            canvas.drawImage(assets['metal'], x, y, tile_size, height * tile_size / width);
+            draw_above(assets['metal']);
         }
     }
+
 }
 
 function random_int(min, max) {
