@@ -14,37 +14,46 @@ const __ = 0.5;
 const _ = 0.1;
 const BORDER_EXPANSION = 1/3;
 const terrain_probs = {'water': {'Xin-xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaji': 0, 'Kickoo': 0.4, 'Hoodrick': 0, 'Luxidoor': 0,
-                        'Vengir': 0, 'Zebasi': 0, 'Ai-mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0, 'Polaris': 0},
+                        'Vengir': 0, 'Zebasi': 0, 'Ai-mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0},
                     'forest': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': _, 'Kickoo': ___, 'Hoodrick': ____, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': __, 'Elyrion': ___, 'Polaris': 0},
+                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': __, 'Elyrion': ___},
                     'mountain': {'Xin-xi': ____, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': __, 'Hoodrick': __, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ____, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': ___, 'Elyrion': __, 'Polaris': 0},
+                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ____, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': ___, 'Elyrion': __},
                     'metal': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0},
+                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
                     'fruit': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': _____,
-                        'Vengir': _, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': _____, 'Yadakk': ____, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0},
+                        'Vengir': _, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': _____, 'Yadakk': ____, 'Aquarion': ___, 'Elyrion': ___},
                     'crop': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': _, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': _, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ____, 'Polaris': 0},
+                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': _, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ____},
                     'game': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': _____, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': __,
-                        'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0},
+                        'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
                     'fish': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ____, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0},
+                        'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
                     'whale': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___, 'Polaris': 0}};
+                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___}};
 const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'crop': 0.5, 'fish': 0.5, 'game': 0.5, 'whale': 0.4, 'metal': 0.5};
 
 let assets = [];
-for (let tribe of tribes_list) {
-    assets[tribe] = [];
-}
-for (let g_t of general_terrain) {
-    assets[g_t] = get_image("assets/" + g_t + ".png");
-}
-for (let tribe of tribes_list) {
-    for (let terr of terrain) {
-        assets[tribe][terr] = get_image("assets/" + tribe + "/" + tribe + " " + terr + ".png");
+let get_assets = new Promise(resolve => {
+    for (let tribe of tribes_list) {
+        assets[tribe] = [];
     }
-    assets[tribe]['capital'] = get_image("assets/" + tribe + "/" + tribe + " head.png");
+    for (let g_t of general_terrain) {
+        assets[g_t] = get_image("assets/" + g_t + ".png");
+    }
+    for (let tribe of tribes_list) {
+        for (let terr of terrain) {
+            assets[tribe][terr] = get_image("assets/" + tribe + "/" + tribe + " " + terr + ".png");
+        }
+        assets[tribe]['capital'] = get_image("assets/" + tribe + "/" + tribe + " head.png");
+    }
+    resolve();
+});
+
+function onload() {
+    get_assets.then(() => {
+        generate();
+    })
 }
 
 function switch_page(new_page) {
@@ -57,7 +66,7 @@ function switch_page(new_page) {
 function get_image(src) {
     let image = new Image();
     image.src = src;
-    return {'image': image, 'width': image.width, 'height': image.height};
+    return image;
 }
 
 function generate() {
@@ -101,13 +110,16 @@ function generate() {
 
     document.getElementById("warning").style.display='none';
 
+    // let the show begin
     let land_coefficient = (0.5 + relief) / 9;
     let map = new Array(map_size**2);
 
+    // add initial ocean tiles
     for (let i = 0; i < map_size**2; i++) {
-        map[i] = {type: 'ocean', above: null, road: false, tribe: 'Xin-xi'};
+        map[i] = {type: 'ocean', above: null, road: false, tribe: 'Xin-xi'}; // tribes don't matter so far
     }
 
+    // randomly replace half of the tiles with ground
     let i = 0;
     while (i < map_size**2 * initial_land) {
         let cell = random_int(0, map_size**2);
@@ -117,73 +129,36 @@ function generate() {
         }
     }
 
+    // turning random water/ground grid into something smooth
     for (let i = 0; i < smoothing; i++) {
-        for (let row = 0; row < map_size; row++) {
-            for (let column = 0; column < map_size; column++) {
-                let water_count = 0;
-                let tile_count = 0;
-                if (column > 0) {
-                    if (row > 0) {
-                        if (map[(row - 1) * map_size + (column - 1)]['type'] === 'ocean')
-                            water_count++;
-                        tile_count++;
-                    }
-                    if (row < map_size - 1) {
-                        if (map[(row + 1) * map_size + (column - 1)]['type'] === 'ocean')
-                            water_count++;
-                        tile_count++;
-                    }
-                    if (map[row * map_size + (column - 1)]['type'] === 'ocean')
-                        water_count++;
-                    tile_count++;
-                }
-                if (column < map_size - 1) {
-                    if (row > 0) {
-                        if (map[(row - 1) * map_size + (column + 1)]['type'] === 'ocean')
-                            water_count++;
-                        tile_count++;
-                    }
-                    if (row < map_size - 1) {
-                        if (map[(row + 1) * map_size + (column + 1)]['type'] === 'ocean')
-                            water_count++;
-                        tile_count++;
-                    }
-                    if (map[row * map_size + (column + 1)]['type'] === 'ocean')
-                        water_count++;
-                    tile_count++;
-                }
-                if (row > 0) {
-                    if (map[(row - 1) * map_size + column]['type'] === 'ocean')
-                        water_count++;
-                    tile_count++;
-                }
-                if (row < map_size - 1) {
-                    if (map[(row + 1) * map_size + column]['type'] === 'ocean')
-                        water_count++;
-                    tile_count++;
-                }
-                if (map[row * map_size + column]['type'] === 'ocean')
+        for (let cell = 0; cell < map_size**2; cell++) {
+            let water_count = 0;
+            let tile_count = 0;
+            let neighbours = round(cell, 1);
+            for (let i = 0; i < neighbours.length; i++) {
+                if (map[neighbours[i]]['type'] === 'ocean') {
                     water_count++;
-                tile_count++;
-
-                if (water_count / tile_count < land_coefficient)
-                    map[row * map_size + column]['road'] = true;
-            }
-        }
-        for (let row = 0; row < map_size; row++) {
-            for (let column = 0; column < map_size; column++) {
-                if (map[row * map_size + column]['road'] === true) {
-                    map[row * map_size + column]['road'] = false;
-                    map[row * map_size + column]['type'] = 'ground';
-                } else {
-                    map[row * map_size + column]['type'] = 'ocean';
                 }
+                tile_count++;
+            }
+            if (water_count / tile_count < land_coefficient)
+                map[cell]['road'] = true; // mark as a road if it has to be ground (most of the neighbours are ground)
+        }
+        // turn marked tiles into ground & everything else into water
+        for (let cell = 0; cell < map_size**2; cell++) {
+            if (map[cell]['road'] === true) {
+                map[cell]['road'] = false;
+                map[cell]['type'] = 'ground';
+            } else {
+                map[cell]['type'] = 'ocean';
             }
         }
     }
 
+    // capital distribution
     let capital_cells = [];
     let capital_map = {};
+    // make a map of potential (ground) tiles associated with numbers (0 by default)
     for (let tribe of tribes) {
         for (let row = 2; row < map_size - 2; row++) {
             for (let column = 2; column < map_size - 2; column++) {
@@ -195,6 +170,7 @@ function generate() {
     }
     for (let tribe of tribes) {
         let max = 0;
+        // this number is a sum of distances between the tile and all capitals
         for (let cell in capital_map) {
             capital_map[cell] = map_size;
             for (let capital_cell of capital_cells) {
@@ -208,11 +184,12 @@ function generate() {
                 len++;
             }
         }
+        // we want to find a tile with a maximum sum
         let rand_cell = random_int(0, len);
         for (let cell of Object.entries(capital_map)) {
             if (cell[1] === max) {
                 if (rand_cell === 0) {
-                    capital_cells.push(cell[0]);
+                    capital_cells.push(parseInt(cell[0]));
                 }
                 rand_cell--;
             }
@@ -223,56 +200,48 @@ function generate() {
         map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['tribe'] = tribes[i];
     }
 
+    // terrain distribution
     let done_tiles = [];
-    let active_tiles = [];
+    let active_tiles = []; // done tiles that generate terrain around them
+    console.dir(done_tiles);
     for (let i = 0; i < capital_cells.length; i++) {
-        let row = capital_cells[i] / map_size | 0;
-        let column = capital_cells[i] % map_size;
-        done_tiles[i] = [row, column];
-        active_tiles[i] = [[row, column]];
+        done_tiles[i] = capital_cells[i];
+        active_tiles[i] = [capital_cells[i]];
     }
+    // we'll start from capital tiles and evenly expand until the whole map is covered
     while (done_tiles.length !== map_size**2) {
         for (let i = 0; i < tribes.length; i++) {
             if (active_tiles[i].length && tribes[i] !== 'Polaris') {
                 let rand_number = random_int(0, active_tiles[i].length);
                 let rand_cell = active_tiles[i][rand_number];
-                let neighbours = [[rand_cell[0]-1, rand_cell[1]],
-                                [rand_cell[0]+1, rand_cell[1]],
-                                [rand_cell[0], rand_cell[1]+1],
-                                [rand_cell[0], rand_cell[1]-1],
-                                [rand_cell[0]-1, rand_cell[1]-1],
-                                [rand_cell[0]+1, rand_cell[1]+1],
-                                [rand_cell[0]-1, rand_cell[1]+1],
-                                [rand_cell[0]+1, rand_cell[1]-1]];
-                let valid_neighbours = neighbours.filter(value => !arr_in_arr(value, done_tiles) &&
-                                0 <= value[0] && value[0] < map_size && 0 <= value[1] && value[1] < map_size &&
-                                map[value[0] * map_size + value[1]]['type'] !== 'water');
+                let neighbours = circle(rand_cell, 1);
+                let valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1 && map[value]['type'] !== 'water');
                 if (!valid_neighbours.length) {
-                    valid_neighbours = neighbours.filter(value => !arr_in_arr(value, done_tiles) &&
-                        0 <= value[0] && value[0] < map_size && 0 <= value[1] && value[1] < map_size);
-                }
+                    valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1);
+                } // if there are no land tiles around, accept water tiles
                 if (valid_neighbours.length) {
                     let new_rand_number = random_int(0, valid_neighbours.length);
                     let new_rand_cell = valid_neighbours[new_rand_number];
-                    map[new_rand_cell[0] * map_size + new_rand_cell[1]]['tribe'] = tribes[i];
+                    map[new_rand_cell]['tribe'] = tribes[i];
                     active_tiles[i].push(new_rand_cell);
                     done_tiles.push(new_rand_cell);
                 } else {
-                    active_tiles[i].splice(rand_number, 1);
+                    active_tiles[i].splice(rand_number, 1); // deactivate tiles surrounded with done tiles
                 }
             }
         }
     }
 
+    // generate forest, mountains, and extra water according to terrain underneath
     for (let cell = 0; cell < map_size**2; cell++) {
         if (map[cell]['type'] === 'ground' && map[cell]['above'] === null) {
-            let rand = Math.random();
+            let rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
             if (rand < general_probs['forest'] * terrain_probs['forest'][map[cell]['tribe']]) {
                 map[cell]['type'] = 'forest';
             } else if (rand > 1 - general_probs['mountain'] * terrain_probs['mountain'][map[cell]['tribe']]) {
                 map[cell]['type'] = 'mountain';
             }
-            rand = Math.random();
+            rand = Math.random(); // 0 (---water---)--------nothing-------- 1
             if (rand < terrain_probs['water'][map[cell]['tribe']]) {
                 map[cell]['type'] = 'ocean';
             }
@@ -298,37 +267,20 @@ function generate() {
     }
     // we'll place villages until there are none of 'far away' tiles
 
+    // replace some ocean with shallow water
     let land_like_terrain = ['ground', 'forest', 'mountain'];
-    for (let row = 0; row < map_size; row++) {
-        for (let column = 0; column < map_size; column++) {
-            if (map[row * map_size + column]['type'] === 'ocean') {
-                if (column > 0) {
-                    if (land_like_terrain.indexOf(map[row * map_size + (column - 1)]['type']) !== -1) {
-                        map[row * map_size + column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (column < map_size - 1) {
-                    if (land_like_terrain.indexOf(map[row * map_size + (column + 1)]['type']) !== -1) {
-                        map[row * map_size + column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (row > 0) {
-                    if (land_like_terrain.indexOf(map[(row - 1) * map_size + column]['type']) !== -1) {
-                        map[row * map_size + column]['type'] = 'water';
-                        continue;
-                    }
-                }
-                if (row < map_size - 1) {
-                    if (land_like_terrain.indexOf(map[(row + 1) * map_size + column]['type']) !== -1) {
-                        map[row * map_size + column]['type'] = 'water';
-                    }
+    for (let cell = 0; cell < map_size**2; cell++) {
+        if (map[cell]['type'] === 'ocean') {
+            for (let neighbour of plus_sign(cell)) {
+                if (land_like_terrain.indexOf(map[neighbour]['type']) !== -1) {
+                    map[cell]['type'] = 'water';
+                    break;
                 }
             }
         }
     }
 
+    // mark tiles next to capitals according to the notation
     for (let capital of capital_cells) {
         village_map[capital] = 3;
         for (let cell of circle(capital, 1)) {
@@ -339,6 +291,7 @@ function generate() {
         }
     }
 
+    // generate villages & mark tiles next to them
     while (village_map.indexOf(0) !== -1) {
         let new_village = rand_array_element(village_map.map((cell, index) => cell === 0 ? index : null).filter(cell => cell !== null));
         village_map[new_village] = 3;
@@ -354,6 +307,7 @@ function generate() {
         return (village_map[cell] === 2 && Math.random() < probability) || (village_map[cell] === 1 && Math.random() < probability * BORDER_EXPANSION)
     }
 
+    // generate resources
     for (let cell = 0; cell < map_size**2; cell++) {
         switch (map[cell]['type']) {
             case 'ground':
@@ -395,8 +349,10 @@ function generate() {
         }
     }
 
+    // we're done!
     display_map(map);
 
+    // display text-map if necessary
     let text_output_check = document.getElementById("text_output_check").checked;
     if (text_output_check)
         print_map(map);
@@ -404,6 +360,7 @@ function generate() {
         document.getElementById("text_display").style.display='none';
 }
 
+// we use pythagorean distances
 function distance(a, b, size) {
     let ax = a % size;
     let ay = a / size | 0;
@@ -432,6 +389,7 @@ function print_map(map) {
     document.getElementById("text_display").style.display='block';
 }
 
+// better ignore this part; broken assets turn map display into a mess with a ton of exceptions
 function display_map(map) {
     let graphic_display = document.getElementById("graphic_display");
     graphic_display.width = graphic_display.width + 0;
@@ -450,25 +408,25 @@ function display_map(map) {
         let above = map[row * map_size + column]['above'];
         let tribe = map[row * map_size + column]['tribe'];
         if (general_terrain.includes(type)) {
-            canvas.drawImage(assets[type]['image'], x, y, tile_size, assets[type]['height'] * tile_size / assets[type]['width']);
+            canvas.drawImage(assets[type], x, y, tile_size, assets[type].height * tile_size / assets[type].width);
         } else if (tribe) {
             if (type === 'forest' || type === 'mountain') {
-                canvas.drawImage(assets[tribe]['ground']['image'], x, y, tile_size, assets[tribe]['ground']['height'] * tile_size / assets[tribe]['ground']['width']);
+                canvas.drawImage(assets[tribe]['ground'], x, y, tile_size, assets[tribe]['ground'].height * tile_size / assets[tribe]['ground'].width);
                 let lowering = tribe === 'Kickoo' && type === 'mountain' ? 0.82 : 0.52;
-                canvas.drawImage(assets[tribe][type]['image'], x, y + lowering * tile_size - tile_size * assets[tribe][type]['height'] / assets[tribe][type]['width'], tile_size, assets[tribe]['ground']['height'] * tile_size / assets[tribe]['ground']['width']);
+                canvas.drawImage(assets[tribe][type], x, y + lowering * tile_size - tile_size * assets[tribe][type].height / assets[tribe][type].width, tile_size, assets[tribe]['ground'].height * tile_size / assets[tribe]['ground'].width);
             } else if (type === 'water' || type === 'ocean') {
-                canvas.drawImage(assets[tribe][type]['image'], x, y - 0.3 * tile_size, tile_size, assets[tribe][type]['height'] * tile_size / assets[tribe][type]['width']);
+                canvas.drawImage(assets[tribe][type], x, y - 0.3 * tile_size, tile_size, assets[tribe][type].height * tile_size / assets[tribe][type].width);
             } else {
-                canvas.drawImage(assets[tribe][type]['image'], x, y, tile_size, assets[tribe][type]['height'] * tile_size / assets[tribe][type]['width']);
+                canvas.drawImage(assets[tribe][type], x, y, tile_size, assets[tribe][type].height * tile_size / assets[tribe][type].width);
             }
         }
 
         function draw_above(image) {
-            canvas.drawImage(image['image'], x, y, tile_size, image['height'] * tile_size / image['width']);
+            canvas.drawImage(image, x, y, tile_size, image.height * tile_size / image.width);
         }
 
         if (above === 'capital') {
-            canvas.drawImage(assets[tribe]['capital']['image'], x, y - 0.3 * tile_size, tile_size, assets[tribe]['capital']['height'] * tile_size / assets[tribe]['capital']['width']);
+            canvas.drawImage(assets[tribe]['capital'], x, y - 0.3 * tile_size, tile_size, assets[tribe]['capital'].height * tile_size / assets[tribe]['capital'].width);
         } else if (above === 'whale') {
             draw_above(assets['whale']);
         } else if (above === 'village') {
@@ -551,4 +509,32 @@ function circle(center, radius) {
         }
     }
     return circle;
+}
+
+function round(center, radius) {
+    let round = [];
+    for (let r = 1; r <= radius; r++) {
+        round = round.concat(circle(center, r));
+    }
+    round.push(center);
+    return round;
+}
+
+function plus_sign(center) {
+    let plus_sign = [];
+    let row = center / map_size | 0;
+    let column = center % map_size;
+    if (column > 0) {
+        plus_sign.push(center - 1);
+    }
+    if (column < map_size - 1) {
+        plus_sign.push(center + 1);
+    }
+    if (row > 0) {
+        plus_sign.push(center - map_size);
+    }
+    if (row < map_size - 1) {
+        plus_sign.push(center + map_size);
+    }
+    return plus_sign;
 }
