@@ -169,51 +169,53 @@ function generate() {
     console.timeEnd('Smoothing');
 
     // capital distribution
-    console.time('Capital distribution');
     let capital_cells = [];
-    let capital_map = {};
-    // make a map of potential (ground) tiles associated with numbers (0 by default)
-    for (let tribe of tribes) {
-        for (let row = 2; row < map_size - 2; row++) {
-            for (let column = 2; column < map_size - 2; column++) {
-                if (map[row * map_size + column]['type'] === 'ground') {
-                    capital_map[row * map_size + column] = 0;
+    if (!fill) {
+        console.time('Capital distribution');
+        let capital_map = {};
+        // make a map of potential (ground) tiles associated with numbers (0 by default)
+        for (let tribe of tribes) {
+            for (let row = 2; row < map_size - 2; row++) {
+                for (let column = 2; column < map_size - 2; column++) {
+                    if (map[row * map_size + column]['type'] === 'ground') {
+                        capital_map[row * map_size + column] = 0;
+                    }
                 }
             }
         }
-    }
-    for (let tribe of tribes) {
-        let max = 0;
-        // this number is a sum of distances between the tile and all capitals
-        for (let cell in capital_map) {
-            capital_map[cell] = map_size;
-            for (let capital_cell of capital_cells) {
-                capital_map[cell] = Math.min(capital_map[cell], distance(cell, capital_cell, map_size));
-            }
-            max = Math.max(max, capital_map[cell]);
-        }
-        let len = 0;
-        for (let cell in capital_map) {
-            if (capital_map[cell] === max) {
-                len++;
-            }
-        }
-        // we want to find a tile with a maximum sum
-        let rand_cell = random_int(0, len);
-        for (let cell of Object.entries(capital_map)) {
-            if (cell[1] === max) {
-                if (rand_cell === 0) {
-                    capital_cells.push(parseInt(cell[0]));
+        for (let tribe of tribes) {
+            let max = 0;
+            // this number is a sum of distances between the tile and all capitals
+            for (let cell in capital_map) {
+                capital_map[cell] = map_size;
+                for (let capital_cell of capital_cells) {
+                    capital_map[cell] = Math.min(capital_map[cell], distance(cell, capital_cell, map_size));
                 }
-                rand_cell--;
+                max = Math.max(max, capital_map[cell]);
+            }
+            let len = 0;
+            for (let cell in capital_map) {
+                if (capital_map[cell] === max) {
+                    len++;
+                }
+            }
+            // we want to find a tile with a maximum sum
+            let rand_cell = random_int(0, len);
+            for (let cell of Object.entries(capital_map)) {
+                if (cell[1] === max) {
+                    if (rand_cell === 0) {
+                        capital_cells.push(parseInt(cell[0]));
+                    }
+                    rand_cell--;
+                }
             }
         }
+        for (let i = 0; i < capital_cells.length; i++) {
+            map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['above'] = 'capital';
+            map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['tribe'] = tribes[i];
+        }
+        console.timeEnd('Capital distribution');
     }
-    for (let i = 0; i < capital_cells.length; i++) {
-        map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['above'] = 'capital';
-        map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['tribe'] = tribes[i];
-    }
-    console.timeEnd('Capital distribution');
 
     // terrain distribution
     if (!fill) {
@@ -276,20 +278,22 @@ function generate() {
     // 1 - border expansion
     // 2 - initial territory
     // 3 - village
-    console.time('Initial village map');
     let village_map = [];
-    for (let cell = 0; cell < map_size**2; cell++) {
-        let row = cell / map_size | 0;
-        let column = cell % map_size;
-        if (map[cell]['type'] === 'ocean' || map[cell]['type'] === 'mountain') {
-            village_map[cell] = -1;
-        } else if (row === 0 || row === map_size - 1 || column === 0 || column === map_size - 1) {
-            village_map[cell] = -1; // villages don't spawn next to the map border
-        } else {
-            village_map[cell] = 0;
+    if (!fill) {
+        console.time('Initial village map');
+        for (let cell = 0; cell < map_size**2; cell++) {
+            let row = cell / map_size | 0;
+            let column = cell % map_size;
+            if (map[cell]['type'] === 'ocean' || map[cell]['type'] === 'mountain') {
+                village_map[cell] = -1;
+            } else if (row === 0 || row === map_size - 1 || column === 0 || column === map_size - 1) {
+                village_map[cell] = -1; // villages don't spawn next to the map border
+            } else {
+                village_map[cell] = 0;
+            }
         }
+        console.timeEnd('Initial village map');
     }
-    console.timeEnd('Initial village map');
     // we'll place villages until there are none of 'far away' tiles
 
     // replace some ocean with shallow water
@@ -308,29 +312,31 @@ function generate() {
     console.timeEnd('Shallow water');
 
     // mark tiles next to capitals according to the notation
-    console.time('Village map generation');
-    for (let capital of capital_cells) {
-        village_map[capital] = 3;
-        for (let cell of circle(capital, 1)) {
-            village_map[cell] = Math.max(village_map[cell], 2);
+    if (!fill) {
+        console.time('Village map generation');
+        for (let capital of capital_cells) {
+            village_map[capital] = 3;
+            for (let cell of circle(capital, 1)) {
+                village_map[cell] = Math.max(village_map[cell], 2);
+            }
+            for (let cell of circle(capital, 2)) {
+                village_map[cell] = Math.max(village_map[cell], 1);
+            }
         }
-        for (let cell of circle(capital, 2)) {
-            village_map[cell] = Math.max(village_map[cell], 1);
-        }
-    }
 
-    // generate villages & mark tiles next to them
-    while (village_map.indexOf(0) !== -1) {
-        let new_village = rand_array_element(village_map.map((cell, index) => cell === 0 ? index : null).filter(cell => cell !== null));
-        village_map[new_village] = 3;
-        for (let cell of circle(new_village, 1)) {
-            village_map[cell] = Math.max(village_map[cell], 2);
+        // generate villages & mark tiles next to them
+        while (village_map.indexOf(0) !== -1) {
+            let new_village = rand_array_element(village_map.map((cell, index) => cell === 0 ? index : null).filter(cell => cell !== null));
+            village_map[new_village] = 3;
+            for (let cell of circle(new_village, 1)) {
+                village_map[cell] = Math.max(village_map[cell], 2);
+            }
+            for (let cell of circle(new_village, 2)) {
+                village_map[cell] = Math.max(village_map[cell], 1);
+            }
         }
-        for (let cell of circle(new_village, 2)) {
-            village_map[cell] = Math.max(village_map[cell], 1);
-        }
+        console.timeEnd('Village map generation');
     }
-    console.timeEnd('Village map generation');
 
     function proc(cell, probability) {
         return (village_map[cell] === 2 && Math.random() < probability) || (village_map[cell] === 1 && Math.random() < probability * BORDER_EXPANSION)
@@ -338,7 +344,7 @@ function generate() {
 
     // generate resources
     let no_resources_check = document.getElementById("no_resources_check").checked;
-    if (!no_resources_check || !no_biomes_check) {
+    if (!no_resources_check && !no_biomes_check && !fill) {
         console.time('Resource generation');
         for (let cell = 0; cell < map_size**2; cell++) {
             switch (map[cell]['type']) {
