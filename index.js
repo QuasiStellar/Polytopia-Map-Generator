@@ -420,10 +420,10 @@ function generate() {
     for (let capital of capital_cells) {
         switch (map[capital]['tribe']) {
             case 'Imperius':
-                post_generate('fruit', 'ground', 2, capital)
+                post_generate('fruit', 'ground', 2, capital);
                 break;
             case 'Bardur':
-                post_generate('game', 'forest', 2, capital)
+                post_generate('game', 'forest', 2, capital);
                 break;
             case 'Kickoo':
                 let resources = check_resources('fish', capital);
@@ -568,23 +568,6 @@ function random_int(min, max) {
 
 function rand_array_element(arr) {
     return arr[Math.random() * arr.length | 0];
-}
-
-function arr_in_arr(piece_a, array) {
-    for (let piece_b of array) {
-        if (piece_b.length === piece_a.length) {
-            let equal = true;
-            for (let i = 0; i < piece_a.length; i++) {
-                if (piece_b[i] !== piece_a[i]) {
-                    equal = false;
-                    break;
-                }
-            }
-            if (equal)
-                return true;
-        }
-    }
-    return false;
 }
 
 function circle(center, radius) {
