@@ -108,15 +108,25 @@ function generate() {
         }
     }
 
+    let fill = document.getElementById("fill").value;
+    if (fill !== '') {
+        if (!tribes_list.includes(fill)) {
+            document.getElementById("warning").innerText = 'Warning: there is no such a tribe.';
+            document.getElementById("warning").style.display='block';
+            return;
+        }
+    }
+
     document.getElementById("warning").style.display='none';
 
     // let the show begin
+    console.time('Initial map');
     let land_coefficient = (0.5 + relief) / 9;
     let map = new Array(map_size**2);
 
     // add initial ocean tiles
     for (let i = 0; i < map_size**2; i++) {
-        map[i] = {type: 'ocean', above: null, road: false, tribe: 'Xin-xi'}; // tribes don't matter so far
+        map[i] = {type: 'ocean', above: null, road: false, tribe: fill ? fill : 'Xin-xi'}; // tribes don't matter so far
     }
 
     // randomly replace half of the tiles with ground
@@ -128,8 +138,10 @@ function generate() {
             map[cell]['type'] = 'ground';
         }
     }
+    console.timeEnd('Initial map');
 
     // turning random water/ground grid into something smooth
+    console.time('Smoothing');
     for (let i = 0; i < smoothing; i++) {
         for (let cell = 0; cell < map_size**2; cell++) {
             let water_count = 0;
@@ -154,8 +166,10 @@ function generate() {
             }
         }
     }
+    console.timeEnd('Smoothing');
 
     // capital distribution
+    console.time('Capital distribution');
     let capital_cells = [];
     let capital_map = {};
     // make a map of potential (ground) tiles associated with numbers (0 by default)
@@ -199,53 +213,62 @@ function generate() {
         map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['above'] = 'capital';
         map[(capital_cells[i] / map_size | 0) * map_size + (capital_cells[i] % map_size)]['tribe'] = tribes[i];
     }
+    console.timeEnd('Capital distribution');
 
     // terrain distribution
-    let done_tiles = [];
-    let active_tiles = []; // done tiles that generate terrain around them
-    console.dir(done_tiles);
-    for (let i = 0; i < capital_cells.length; i++) {
-        done_tiles[i] = capital_cells[i];
-        active_tiles[i] = [capital_cells[i]];
-    }
-    // we'll start from capital tiles and evenly expand until the whole map is covered
-    while (done_tiles.length !== map_size**2) {
-        for (let i = 0; i < tribes.length; i++) {
-            if (active_tiles[i].length && tribes[i] !== 'Polaris') {
-                let rand_number = random_int(0, active_tiles[i].length);
-                let rand_cell = active_tiles[i][rand_number];
-                let neighbours = circle(rand_cell, 1);
-                let valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1 && map[value]['type'] !== 'water');
-                if (!valid_neighbours.length) {
-                    valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1);
-                } // if there are no land tiles around, accept water tiles
-                if (valid_neighbours.length) {
-                    let new_rand_number = random_int(0, valid_neighbours.length);
-                    let new_rand_cell = valid_neighbours[new_rand_number];
-                    map[new_rand_cell]['tribe'] = tribes[i];
-                    active_tiles[i].push(new_rand_cell);
-                    done_tiles.push(new_rand_cell);
-                } else {
-                    active_tiles[i].splice(rand_number, 1); // deactivate tiles surrounded with done tiles
+    if (!fill) {
+        console.time('Terrain distribution');
+        let done_tiles = [];
+        let active_tiles = []; // done tiles that generate terrain around them
+        for (let i = 0; i < capital_cells.length; i++) {
+            done_tiles[i] = capital_cells[i];
+            active_tiles[i] = [capital_cells[i]];
+        }
+        // we'll start from capital tiles and evenly expand until the whole map is covered
+        while (done_tiles.length !== map_size**2) {
+            for (let i = 0; i < tribes.length; i++) {
+                if (active_tiles[i].length && tribes[i] !== 'Polaris') {
+                    let rand_number = random_int(0, active_tiles[i].length);
+                    let rand_cell = active_tiles[i][rand_number];
+                    let neighbours = circle(rand_cell, 1);
+                    let valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1 && map[value]['type'] !== 'water');
+                    if (!valid_neighbours.length) {
+                        valid_neighbours = neighbours.filter(value => done_tiles.indexOf(value) === -1);
+                    } // if there are no land tiles around, accept water tiles
+                    if (valid_neighbours.length) {
+                        let new_rand_number = random_int(0, valid_neighbours.length);
+                        let new_rand_cell = valid_neighbours[new_rand_number];
+                        map[new_rand_cell]['tribe'] = tribes[i];
+                        active_tiles[i].push(new_rand_cell);
+                        done_tiles.push(new_rand_cell);
+                    } else {
+                        active_tiles[i].splice(rand_number, 1); // deactivate tiles surrounded with done tiles
+                    }
                 }
             }
         }
+        console.timeEnd('Terrain distribution');
     }
 
     // generate forest, mountains, and extra water according to terrain underneath
-    for (let cell = 0; cell < map_size**2; cell++) {
-        if (map[cell]['type'] === 'ground' && map[cell]['above'] === null) {
-            let rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
-            if (rand < general_probs['forest'] * terrain_probs['forest'][map[cell]['tribe']]) {
-                map[cell]['type'] = 'forest';
-            } else if (rand > 1 - general_probs['mountain'] * terrain_probs['mountain'][map[cell]['tribe']]) {
-                map[cell]['type'] = 'mountain';
-            }
-            rand = Math.random(); // 0 (---water---)--------nothing-------- 1
-            if (rand < terrain_probs['water'][map[cell]['tribe']]) {
-                map[cell]['type'] = 'ocean';
+    let no_biomes_check = document.getElementById("no_biomes_check").checked;
+    if (!no_biomes_check) {
+        console.time('Biome generation');
+        for (let cell = 0; cell < map_size**2; cell++) {
+            if (map[cell]['type'] === 'ground' && map[cell]['above'] === null) {
+                let rand = Math.random(); // 0 (---forest---)--nothing--(-mountain-) 1
+                if (rand < general_probs['forest'] * terrain_probs['forest'][map[cell]['tribe']]) {
+                    map[cell]['type'] = 'forest';
+                } else if (rand > 1 - general_probs['mountain'] * terrain_probs['mountain'][map[cell]['tribe']]) {
+                    map[cell]['type'] = 'mountain';
+                }
+                rand = Math.random(); // 0 (---water---)--------nothing-------- 1
+                if (rand < terrain_probs['water'][map[cell]['tribe']]) {
+                    map[cell]['type'] = 'ocean';
+                }
             }
         }
+        console.timeEnd('Biome generation');
     }
 
     // -1 - water far away
@@ -253,6 +276,7 @@ function generate() {
     // 1 - border expansion
     // 2 - initial territory
     // 3 - village
+    console.time('Initial village map');
     let village_map = [];
     for (let cell = 0; cell < map_size**2; cell++) {
         let row = cell / map_size | 0;
@@ -265,9 +289,11 @@ function generate() {
             village_map[cell] = 0;
         }
     }
+    console.timeEnd('Initial village map');
     // we'll place villages until there are none of 'far away' tiles
 
     // replace some ocean with shallow water
+    console.time('Shallow water');
     let land_like_terrain = ['ground', 'forest', 'mountain'];
     for (let cell = 0; cell < map_size**2; cell++) {
         if (map[cell]['type'] === 'ocean') {
@@ -279,8 +305,10 @@ function generate() {
             }
         }
     }
+    console.timeEnd('Shallow water');
 
     // mark tiles next to capitals according to the notation
+    console.time('Village map generation');
     for (let capital of capital_cells) {
         village_map[capital] = 3;
         for (let cell of circle(capital, 1)) {
@@ -302,55 +330,64 @@ function generate() {
             village_map[cell] = Math.max(village_map[cell], 1);
         }
     }
+    console.timeEnd('Village map generation');
 
     function proc(cell, probability) {
         return (village_map[cell] === 2 && Math.random() < probability) || (village_map[cell] === 1 && Math.random() < probability * BORDER_EXPANSION)
     }
 
     // generate resources
-    for (let cell = 0; cell < map_size**2; cell++) {
-        switch (map[cell]['type']) {
-            case 'ground':
-                if (map[cell]['above'] !== 'capital') {
-                    if (village_map[cell] === 3) {
-                        map[cell]['above'] = 'village';
-                    } else if (proc(cell, general_probs['fruit'] * terrain_probs['fruit'][map[cell]['tribe']])) {
-                        map[cell]['above'] = 'fruit';
-                    } else if (proc(cell, general_probs['crop'] * terrain_probs['crop'][map[cell]['tribe']] / (1 - general_probs['fruit'] * terrain_probs['fruit'][map[cell]['tribe']]))) {
-                        map[cell]['above'] = 'crop';
+    let no_resources_check = document.getElementById("no_resources_check").checked;
+    if (!no_resources_check || !no_biomes_check) {
+        console.time('Resource generation');
+        for (let cell = 0; cell < map_size**2; cell++) {
+            switch (map[cell]['type']) {
+                case 'ground':
+                    if (map[cell]['above'] !== 'capital') {
+                        if (village_map[cell] === 3) {
+                            map[cell]['above'] = 'village';
+                        } else if (proc(cell, general_probs['fruit'] * terrain_probs['fruit'][map[cell]['tribe']])) {
+                            map[cell]['above'] = 'fruit';
+                        } else if (proc(cell, general_probs['crop'] * terrain_probs['crop'][map[cell]['tribe']] / (1 - general_probs['fruit'] * terrain_probs['fruit'][map[cell]['tribe']]))) {
+                            map[cell]['above'] = 'crop';
+                        }
                     }
-                }
-                break;
-            case 'forest':
-                if (map[cell]['above'] !== 'capital') {
-                    if (village_map[cell] === 3) {
-                        map[cell]['type'] = 'ground';
-                        map[cell]['above'] = 'village';
-                    } else if (proc(cell, general_probs['game'] * terrain_probs['game'][map[cell]['tribe']])) {
-                        map[cell]['above'] = 'game';
+                    break;
+                case 'forest':
+                    if (map[cell]['above'] !== 'capital') {
+                        if (village_map[cell] === 3) {
+                            map[cell]['type'] = 'ground';
+                            map[cell]['above'] = 'village';
+                        } else if (proc(cell, general_probs['game'] * terrain_probs['game'][map[cell]['tribe']])) {
+                            map[cell]['above'] = 'game';
+                        }
                     }
-                }
-                break;
-            case 'water':
-                if (proc(cell, general_probs['fish'] * terrain_probs['fish'][map[cell]['tribe']])) {
-                    map[cell]['above'] = 'fish';
-                }
-                break;
-            case 'ocean':
-                if (proc(cell, general_probs['whale'] * terrain_probs['whale'][map[cell]['tribe']])) {
-                    map[cell]['above'] = 'whale';
-                }
-                break;
-            case 'mountain':
-                if (proc(cell, general_probs['metal'] * terrain_probs['metal'][map[cell]['tribe']])) {
-                    map[cell]['above'] = 'metal';
-                }
-                break;
+                    break;
+                case 'water':
+                    if (proc(cell, general_probs['fish'] * terrain_probs['fish'][map[cell]['tribe']])) {
+                        map[cell]['above'] = 'fish';
+                    }
+                    break;
+                case 'ocean':
+                    if (proc(cell, general_probs['whale'] * terrain_probs['whale'][map[cell]['tribe']])) {
+                        map[cell]['above'] = 'whale';
+                    }
+                    break;
+                case 'mountain':
+                    if (proc(cell, general_probs['metal'] * terrain_probs['metal'][map[cell]['tribe']])) {
+                        map[cell]['above'] = 'metal';
+                    }
+                    break;
+            }
         }
+        console.timeEnd('Resource generation');
     }
-
     // we're done!
+
+    console.time('Display');
     display_map(map);
+    console.timeEnd('Display');
+    console.log('_______________________');
 
     // display text-map if necessary
     let text_output_check = document.getElementById("text_output_check").checked;
