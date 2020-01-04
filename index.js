@@ -31,7 +31,7 @@ const terrain_probs = {'water': {'Xin-xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaj
                         'Vengir': __, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
                     'whale': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
                         'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___}};
-const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'crop': 0.5, 'fish': 0.5, 'game': 0.5, 'whale': 0.4, 'metal': 0.5};
+const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'crop': 0.5, 'fish': 0, 'game': 0.5, 'whale': 0.4, 'metal': 0.5}; //fish 0.5
 
 let assets = [];
 let get_assets = new Promise(resolve => {
@@ -388,6 +388,78 @@ function generate() {
         }
         console.timeEnd('Resource generation');
     }
+
+    function check_resources(resource, capital) {
+        let resources = 0;
+        for (let neighbour of circle(capital, 1)) {
+            if (map[neighbour]['above'] === resource) {
+                resources++;
+            }
+        }
+        return resources;
+    }
+
+    function post_generate(resource, underneath, quantity, capital) {
+        let resources = check_resources(resource, capital);
+        while (resources < quantity) {
+            let pos = random_int(0, 8);
+            let territory = circle(capital, 1);
+            map[territory[pos]]['type'] = underneath;
+            map[territory[pos]]['above'] = resource;
+            for (let neighbour of plus_sign(territory[pos])) {
+                if (map[neighbour]['type'] === 'ocean') {
+                    map[neighbour]['type'] = 'water';
+                }
+            }
+            resources = check_resources(resource, capital);
+        }
+    }
+
+    // tribe specific things
+    console.time('Tribe specific');
+    for (let capital of capital_cells) {
+        switch (map[capital]['tribe']) {
+            case 'Imperius':
+                post_generate('fruit', 'ground', 2, capital)
+                break;
+            case 'Bardur':
+                post_generate('game', 'forest', 2, capital)
+                break;
+            case 'Kickoo':
+                let resources = check_resources('fish', capital);
+                while (resources < 2) {
+                    let pos = random_int(0, 4);
+                    let territory = plus_sign(capital);
+                    map[territory[pos]]['type'] = 'water';
+                    map[territory[pos]]['above'] = 'fish';
+                    for (let neighbour of plus_sign(territory[pos])) {
+                        if (map[neighbour]['type'] === 'water') {
+                            map[neighbour]['type'] = 'ocean';
+                            for (let double_neighbour of plus_sign(neighbour)) {
+                                if (map[double_neighbour]['type'] !== 'water' && map[double_neighbour]['type'] !== 'ocean') {
+                                    map[neighbour]['type'] = 'water';
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    resources = check_resources('fish', capital);
+                }
+                break;
+            case 'Zebasi':
+                post_generate('crop', 'ground', 1, capital);
+                break;
+            case 'Elyrion':
+                post_generate('game', 'forest', 2, capital);
+                break;
+            case 'Polaris':
+                for (let neighbour of circle(capital, 1)) {
+                    map[neighbour]['tribe'] = 'Polaris';
+                }
+                break;
+        }
+    }
+    console.timeEnd('Tribe specific');
     // we're done!
 
     console.time('Display');
