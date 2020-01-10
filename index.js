@@ -312,6 +312,7 @@ function generate() {
     console.timeEnd('Shallow water');
 
     // mark tiles next to capitals according to the notation
+    let village_count = 0;
     if (!fill) {
         console.time('Village map generation');
         for (let capital of capital_cells) {
@@ -334,6 +335,7 @@ function generate() {
             for (let cell of circle(new_village, 2)) {
                 village_map[cell] = Math.max(village_map[cell], 1);
             }
+            village_count++;
         }
         console.timeEnd('Village map generation');
     }
@@ -387,6 +389,31 @@ function generate() {
             }
         }
         console.timeEnd('Resource generation');
+    }
+
+    // ruins generation
+    let ruins_number;
+    if (!fill) {
+        console.time('Ruin generation');
+        ruins_number = Math.round(map_size**2/40);
+        let water_ruins_number = Math.round(ruins_number/3);
+        let ruins_count = 0;
+        let water_ruins_count = 0;
+        while (ruins_count < ruins_number) {
+            let ruin = rand_array_element(village_map.map((cell, index) => cell === 0 || cell === 1 || cell === -1 ? index : null).filter(cell => cell !== null));
+            let terrain = map[ruin].type;
+            if (terrain !== 'water' && (water_ruins_count < water_ruins_number || terrain !== 'ocean')) {
+                map[ruin].above = 'ruin'; // actually there can be both ruin and resource on a single tile but only ruin is displayed; as it is just a map generator it doesn't matter
+                if (terrain === 'ocean') {
+                    water_ruins_count++;
+                }
+                for (let cell of circle(ruin, 1)) {
+                    village_map[cell] = Math.max(village_map[cell], 2); // we won't use this array anymore anyway
+                }
+                ruins_count++;
+            }
+        }
+        console.timeEnd('Ruin generation');
     }
 
     function check_resources(resource, capital) {
@@ -465,6 +492,9 @@ function generate() {
     console.time('Display');
     display_map(map);
     console.timeEnd('Display');
+    console.log('_______________________');
+    console.log('Number of villages: ' + village_count);
+    console.log('Number of ruins: ' + ruins_number);
     console.log('_______________________');
 
     // display text-map if necessary
@@ -556,6 +586,8 @@ function display_map(map) {
             draw_above(assets['fish']);
         } else if (above === 'metal') {
             draw_above(assets['metal']);
+        } else if (above === 'ruin') {
+            draw_above(assets['ruin']);
         }
     }
 
