@@ -153,7 +153,7 @@ function generate() {
                 }
                 tile_count++;
             }
-            if (water_count / tile_count < land_coefficient)
+            if (water_count / tile_count <= land_coefficient)
                 map[cell]['road'] = true; // mark as a road if it has to be ground (most of the neighbours are ground)
         }
         // turn marked tiles into ground & everything else into water
