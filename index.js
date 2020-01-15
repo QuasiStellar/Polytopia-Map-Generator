@@ -7,28 +7,28 @@ const tribes_list = ['Xin-xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodri
     'Ai-mo', 'Quetzali', 'Yadakk', 'Aquarion', 'Elyrion', 'Polaris'];
 const terrain = ['forest', 'fruit', 'game', 'ground', 'mountain'];
 const general_terrain = ['crop', 'fish', 'metal', 'ocean', 'ruin', 'village', 'water', 'whale'];
-const _____ = 2;
-const ____ = 1.5;
+const $$$$$ = 2;
+const $$$$ = 1.5;
 const ___ = 1;
-const __ = 0.5;
-const _ = 0.1;
+const $$ = 0.5;
+const $ = 0.1;
 const BORDER_EXPANSION = 1/3;
 const terrain_probs = {'water': {'Xin-xi': 0, 'Imperius': 0, 'Bardur': 0, 'Oumaji': 0, 'Kickoo': 0.4, 'Hoodrick': 0, 'Luxidoor': 0,
                         'Vengir': 0, 'Zebasi': 0, 'Ai-mo': 0, 'Quetzali': 0, 'Yadakk': 0, 'Aquarion': 0.3, 'Elyrion': 0},
-                    'forest': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': _, 'Kickoo': ___, 'Hoodrick': ____, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': __, 'Elyrion': ___},
-                    'mountain': {'Xin-xi': ____, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': __, 'Hoodrick': __, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': __, 'Ai-mo': ____, 'Quetzali': ___, 'Yadakk': __, 'Aquarion': ___, 'Elyrion': __},
+                    'forest': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': $, 'Kickoo': ___, 'Hoodrick': $$$$, 'Luxidoor': ___,
+                        'Vengir': ___, 'Zebasi': $$, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': $$, 'Aquarion': $$, 'Elyrion': ___},
+                    'mountain': {'Xin-xi': $$$$, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': $$, 'Hoodrick': $$, 'Luxidoor': ___,
+                        'Vengir': ___, 'Zebasi': $$, 'Ai-mo': $$$$, 'Quetzali': ___, 'Yadakk': $$, 'Aquarion': ___, 'Elyrion': $$},
                     'metal': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': _____, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
-                    'fruit': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ____, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': _____,
-                        'Vengir': _, 'Zebasi': __, 'Ai-mo': ___, 'Quetzali': _____, 'Yadakk': ____, 'Aquarion': ___, 'Elyrion': ___},
-                    'crop': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': _, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': _, 'Quetzali': _, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ____},
-                    'game': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': _____, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': __,
-                        'Vengir': _, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
-                    'fish': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ____, 'Hoodrick': ___, 'Luxidoor': ___,
-                        'Vengir': _, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
+                        'Vengir': $$$$$, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': $, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
+                    'fruit': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': $$$$, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': $$$$$,
+                        'Vengir': $, 'Zebasi': $$, 'Ai-mo': ___, 'Quetzali': $$$$$, 'Yadakk': $$$$, 'Aquarion': ___, 'Elyrion': ___},
+                    'crop': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': $, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
+                        'Vengir': ___, 'Zebasi': ___, 'Ai-mo': $, 'Quetzali': $, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': $$$$},
+                    'game': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': $$$$$, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': $$,
+                        'Vengir': $, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
+                    'fish': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': $$$$, 'Hoodrick': ___, 'Luxidoor': ___,
+                        'Vengir': $, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___},
                     'whale': {'Xin-xi': ___, 'Imperius': ___, 'Bardur': ___, 'Oumaji': ___, 'Kickoo': ___, 'Hoodrick': ___, 'Luxidoor': ___,
                         'Vengir': ___, 'Zebasi': ___, 'Ai-mo': ___, 'Quetzali': ___, 'Yadakk': ___, 'Aquarion': ___, 'Elyrion': ___}};
 const general_probs = {'mountain': 0.15, 'forest': 0.4, 'fruit': 0.5, 'crop': 0.5, 'fish': 0.5, 'game': 0.5, 'whale': 0.4, 'metal': 0.5};
