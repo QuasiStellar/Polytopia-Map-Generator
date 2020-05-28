@@ -249,7 +249,7 @@ def post_generate(resource, underneath, quantity, capital):
         territory_ = utils.circle(capital, 1, map_size)
         world_map[territory_[pos_]]['type'] = underneath
         world_map[territory_[pos_]]['above'] = resource
-        for neighbour_ in utils.plus_sign(territory[pos], map_size):
+        for neighbour_ in utils.plus_sign(territory[pos_], map_size):
             if world_map[neighbour_]['type'] == 'ocean':
                 world_map[neighbour_]['type'] = 'water'
         resources_ = check_resources(resource, capital)
